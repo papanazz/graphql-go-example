@@ -147,12 +147,20 @@ func main() {
 					"album": &graphql.ArgumentConfig{
 						Type: graphql.NewNonNull(graphql.String),
 					},
+					"limit": &graphql.ArgumentConfig{
+						Type: graphql.Int,
+					},
 				},
 				Resolve: func(params graphql.ResolveParams) (interface{}, error) {
 					album := params.Args["album"].(string)
 					filtered := Filter(songs, func(v Song) bool {
 						return strings.Contains(v.Album, album)
 					})
+
+					if limit, exists := params.Args["limit"].(int); exists {
+						return filtered[0:limit], nil
+					}
+
 					return filtered, nil
 				},
 			},
